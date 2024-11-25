@@ -1,66 +1,10 @@
-import { useState, useMemo } from "react";
+import { useState } from "react";
+import useFilterItems from "./hooks/useFilterItems";
+import useLocalStorage from "./hooks/useLocalStorage";
 
-/**
- * Custom hook to filter items based on a query string.
- * 
- * @returns {Object} An object containing:
- * - items: The current list of items.
- * - setItems: Function to update the list of items.
- * - query: The current search query.
- * - setQuery: Function to update the search query.
- * - filteredItems: The list of items filtered by the query.
- */
-export function useFilterItems() {
-  const [items, setItems] = useState([]);
-  const [query, setQuery] = useState("");
-
-  const filteredItems = useMemo(() => {
-    return items.filter(
-      (item) => {
-        return item.toLocaleLowerCase().includes(query.toLocaleLowerCase());
-      },
-      [items, query]
-    );
-  });
-
-  return {
-    items,
-    setItems,
-    query,
-    setQuery,
-    filteredItems,
-  };
-}
-
-/**
- * Custom hook to manage state with local storage.
- * 
- * @param {string} key - The key for the local storage item.
- * @param {*} initialValue - The initial value to set if the key does not exist.
- * @returns {[*, Function]} An array containing:
- * - storedValue: The current value stored in local storage.
- * - setStoredValue: Function to update the stored value.
- */
-export function useLocalStorage(key, initialValue) {
-  const [storedValue, setStoredValue] = useState(() => {
-    try {
-      const item = window.localStorage.getItem(key);
-      return item ? JSON.parse(item) : initialValue;
-    } catch (error) {
-      console.error(error);
-      return initialValue;
-    }
-  });
-
-  useEffect(() => {
-    try {
-      window.localStorage.setItem(key, JSON.stringify(storedValue));
-    } catch (error) {
-      console.error(error);
-    }
-  }, [key, storedValue]);
-
-  return [storedValue, setStoredValue];
+export {
+  useFilterItems,
+  useLocalStorage,
 }
 
 /**
