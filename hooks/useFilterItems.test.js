@@ -10,6 +10,7 @@ describe('useFilterItems', () => {
         expect(result.current.filteredItems).toEqual([]);
     });
 
+    // FIX: This test is fail and need investigation
     it('should update items and filter them based on query', () => {
         const { result } = renderHook(() => useFilterItems());
 
