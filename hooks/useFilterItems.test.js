@@ -13,13 +13,14 @@ describe('useFilterItems', () => {
     // FIX: This test is fail and need investigation
     it('should update items and filter them based on query', () => {
         const { result } = renderHook(() => useFilterItems());
+        const testArray = ['apple', 'banana', 'cherry'];
 
         // Set initial items
         act(() => {
-            result.current.setItems(['apple', 'banana', 'cherry']);
+            result.current.setItems(testArray);
         });
 
-        expect(result.current.items).toEqual(['apple', 'banana', 'cherry']);
+        expect(result.current.items).toEqual(testArray);
 
         const queryString = 'ban';
         // Set query to filter items
@@ -32,7 +33,9 @@ describe('useFilterItems', () => {
             'Filtered items after query set to: ' + queryString,
             result.current.filteredItems
         );
-        expect(result.current.filteredItems).toEqual(['apple']);
+
+        // Expect filtered items to include 'banana'
+        expect(result.current.filteredItems).toEqual(['banana']);
     });
 
 

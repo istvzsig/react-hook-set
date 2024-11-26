@@ -12,7 +12,7 @@ import { useState, useMemo } from 'react';
  * - filteredItems: The list of items filtered by the query.
  */
 export default function useFilterItems(filterFunction = (item, query) => {
-    item.toString().toLowerCase().includes(query.toLowerCase())
+    return item.toString().toLowerCase().includes(query.toLowerCase())
 }) {
     const [items, setItems] = useState([]);
     const [query, setQuery] = useState("");
