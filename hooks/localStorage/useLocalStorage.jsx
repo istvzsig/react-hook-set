@@ -1,3 +1,5 @@
+import { useState, useEffect } from 'react';
+
 /**
  * Custom hook to manage state with local storage.
  * 
@@ -7,13 +9,12 @@
  * - storedValue: The current value stored in local storage.
  * - setStoredValue: Function to update the stored value.
  */
-export function useLocalStorage(key = "", initialValue = {}) {
+export default function useLocalStorage(key = "", initialValue = {}) {
     const [storedValue, setStoredValue] = useState(() => {
         try {
             const item = window.localStorage.getItem(key);
             return item ? JSON.parse(item) : initialValue;
         } catch (error) {
-            console.error(error);
             return initialValue;
         }
     });
