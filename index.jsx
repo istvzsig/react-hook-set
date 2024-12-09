@@ -7,26 +7,7 @@ export {
   useFilterItems,
   useLocalStorage,
   useFetch,
-}
-
-
-
-/**
- * Custom hook to toggle a boolean value.
- * 
- * @param {boolean} initialValue - The initial value of the toggle.
- * @returns {[boolean, Function]} An array containing:
- * - value: The current boolean value.
- * - toggle: Function to toggle the value.
- */
-export function useToggle(initialValue = false) {
-  const [value, setValue] = useState(initialValue);
-
-  const toggle = () => {
-    setValue((prevValue) => !prevValue);
-  };
-
-  return [value, toggle];
+  useToggle,
 }
 
 /**
