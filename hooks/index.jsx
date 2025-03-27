@@ -7,3 +7,4 @@ export { default as useLocalStorage } from './localStorage/useLocalStorage';
 export { default as usePrevious } from './previous/usePrevious';
 export { default as useInterval } from './time/useInterval';
 export { default as useToggle } from './toggle/useToggle';
+export { default as useWebsocket } from './websocket/useWebsocket';
