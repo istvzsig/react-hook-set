@@ -1,29 +1,73 @@
-import { useEffect } from "react";
+import React, { useRef } from "react";
+import { render, fireEvent } from "@testing-library/react";
+import { useOnClickOutside } from "./useOnClickOutside";
 
-/**
- * Custom hook to detect clicks outside of a specified element.
- *
- * @param {Object} ref - The ref of the element to detect clicks outside of.
- * @param {Function} handler - The function to call when a click outside is detected.
- */
-export function useOnClickOutside(ref, handler) {
-  useEffect(() => {
-    const listener = (event) => {
-      // Check if the click is outside the referenced element
-      if (!ref.current || ref.current.contains(event.target)) {
-        return;
-      }
-      handler(event); // Call the handler if the click is outside
-    };
+function TestComponent({ onClickOutside }) {
+  const ref = useRef(null);
+  useOnClickOutside(onClickOutside);
 
-    // Add event listeners for mousedown and touchstart
-    document.addEventListener("mousedown", listener);
-    document.addEventListener("touchstart", listener);
-
-    // Cleanup function to remove the event listeners
-    return () => {
-      document.removeEventListener("mousedown", listener);
-      document.removeEventListener("touchstart", listener);
-    };
-  }, [ref, handler]); // Dependencies
+  return (
+    <div ref={ref} data-testid="inside">
+      Click inside
+    </div>
+  );
 }
+
+describe("useOnClickOutside", () => {
+  let handleClickOutside;
+
+  beforeEach(() => {
+    handleClickOutside = jest.fn();
+  });
+
+  it("does not call handler when clicking inside the referenced element", () => {
+    const { getByTestId } = render(
+      <TestComponent onClickOutside={handleClickOutside} />
+    );
+
+    // Click inside the component
+    fireEvent.mouseDown(getByTestId("inside"));
+
+    // Check that the handler was not called
+    expect(handleClickOutside).not.toHaveBeenCalled();
+  });
+
+  it("cleans up event listeners on unmount", () => {
+    const { unmount } = render(
+      <TestComponent onClickOutside={handleClickOutside} />
+    );
+
+    // Unmount the component
+    unmount();
+
+    // Click outside the component
+    fireEvent.mouseDown(document.body);
+
+    // Check that the handler was not called
+    expect(handleClickOutside).not.toHaveBeenCalled();
+  });
+
+  it("handles null ref gracefully", () => {
+    const { unmount } = render(
+      <TestComponent onClickOutside={handleClickOutside} />
+    );
+
+    // Click outside the component
+    fireEvent.mouseDown(document.body);
+
+    // Check that the handler was not called
+    expect(handleClickOutside).not.toHaveBeenCalled();
+  });
+
+  it("handles undefined ref gracefully", () => {
+    const { unmount } = render(
+      <TestComponent onClickOutside={handleClickOutside} />
+    );
+
+    // Click outside the component
+    fireEvent.mouseDown(document.body);
+
+    // Check that the handler was not called
+    expect(handleClickOutside).not.toHaveBeenCalled();
+  });
+});
