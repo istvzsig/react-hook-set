@@ -1,4 +1,4 @@
-import React, { useRef } from "react";
+import { useRef } from "react";
 import { render, fireEvent } from "@testing-library/react";
 import { useOnClickOutside } from "./useOnClickOutside";
 
@@ -22,7 +22,7 @@ describe("useOnClickOutside", () => {
 
   it("does not call handler when clicking inside the referenced element", () => {
     const { getByTestId } = render(
-      <TestComponent onClickOutside={handleClickOutside} />
+      <TestComponent onClickOutside={handleClickOutside} />,
     );
 
     // Click inside the component
@@ -34,7 +34,7 @@ describe("useOnClickOutside", () => {
 
   it("cleans up event listeners on unmount", () => {
     const { unmount } = render(
-      <TestComponent onClickOutside={handleClickOutside} />
+      <TestComponent onClickOutside={handleClickOutside} />,
     );
 
     // Unmount the component
@@ -49,7 +49,7 @@ describe("useOnClickOutside", () => {
 
   it("handles null ref gracefully", () => {
     const { unmount } = render(
-      <TestComponent onClickOutside={handleClickOutside} />
+      <TestComponent onClickOutside={handleClickOutside} />,
     );
 
     // Click outside the component
@@ -61,7 +61,7 @@ describe("useOnClickOutside", () => {
 
   it("handles undefined ref gracefully", () => {
     const { unmount } = render(
-      <TestComponent onClickOutside={handleClickOutside} />
+      <TestComponent onClickOutside={handleClickOutside} />,
     );
 
     // Click outside the component

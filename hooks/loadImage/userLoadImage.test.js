@@ -17,7 +17,7 @@ describe("useLoadImage", () => {
 
   it("should initialize with null image, false loading, and initial error", () => {
     const { result } = renderHook(() =>
-      useLoadImage("http://test.com/image.jpg")
+      useLoadImage("http://test.com/image.jpg"),
     );
     expect(result.current.image).toBe(null);
     expect(result.current.loading).toBe(false);
@@ -64,7 +64,7 @@ describe("useLoadImage", () => {
     global.Image = jest.fn(() => mockImageInstance);
 
     const { result } = renderHook(() =>
-      useLoadImage(dummy_image_url + " FAIL")
+      useLoadImage(dummy_image_url + " FAIL"),
     );
 
     await act(async () => {

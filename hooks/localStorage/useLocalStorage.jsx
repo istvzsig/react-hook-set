@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 
 /**
  * Custom hook to manage state with local storage.
- * 
+ *
  * @param {string} key - The key for the local storage item.
  * @param {*} initialValue - The initial value to set if the key does not exist.
  * @returns {[*, Function]} An array containing:
@@ -10,22 +10,22 @@ import { useState, useEffect } from 'react';
  * - setStoredValue: Function to update the stored value.
  */
 export default function useLocalStorage(key = "", initialValue = {}) {
-    const [storedValue, setStoredValue] = useState(() => {
-        try {
-            const item = window.localStorage.getItem(key);
-            return item ? JSON.parse(item) : initialValue;
-        } catch (error) {
-            return initialValue;
-        }
-    });
+  const [storedValue, setStoredValue] = useState(() => {
+    try {
+      const item = window.localStorage.getItem(key);
+      return item ? JSON.parse(item) : initialValue;
+    } catch (error) {
+      return initialValue;
+    }
+  });
 
-    useEffect(() => {
-        try {
-            window.localStorage.setItem(key, JSON.stringify(storedValue));
-        } catch (error) {
-            console.error(error);
-        }
-    }, [key, storedValue]);
+  useEffect(() => {
+    try {
+      window.localStorage.setItem(key, JSON.stringify(storedValue));
+    } catch (error) {
+      console.error(error);
+    }
+  }, [key, storedValue]);
 
-    return [storedValue, setStoredValue];
+  return [storedValue, setStoredValue];
 }

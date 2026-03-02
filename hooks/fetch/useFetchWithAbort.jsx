@@ -15,30 +15,31 @@ export function useFetchWithAbort(url) {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const controller = new AbortController(); // Create an AbortController
+    const controller = new AbortController();
+
     const fetchData = async () => {
       try {
-        const response = await fetch(url, { signal: controller.signal }); // Pass the signal to fetch
+        const response = await fetch(url, { signal: controller.signal });
         if (!response.ok) {
           throw new Error("Network response was not ok");
         }
         const result = await response.json();
-        setData(result); // Set the fetched data
+        setData(result);
       } catch (error) {
         if (error.name !== "AbortError") {
-          setError(error); // Set error if not an abort error
+          setError(error);
         }
       } finally {
-        setLoading(false); // Set loading to false after fetch
+        setLoading(false);
       }
     };
 
     fetchData();
 
     return () => {
-      controller.abort(); // Abort the fetch request on cleanup
+      controller.abort();
     };
-  }, [url]); // Re-run effect if URL changes
+  }, [url]);
 
-  return { data, loading, error }; // Return the data, loading state, and error
+  return { data, loading, error };
 }

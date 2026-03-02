@@ -1,72 +1,104 @@
-import { renderHook, act } from '@testing-library/react';
-import useFetch from './useFetch';
-import { waitFor } from '@testing-library/react';
+import { renderHook } from "@testing-library/react";
 
-global.fetch = jest.fn();
+import useFetch from "./useFetch";
 
-describe('useFetch', () => {
+describe("useFetch", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
 
-    const jsonPlaceholder = "https://jsonplaceholder.typicode.com/todos/1";
+  it("should handle an empty URL", async () => {
+    const { result, waitForNextUpdate } = renderHook(() => useFetch(""));
+    await waitForNextUpdate();
+    expect(result.current.loading).toBe(false);
+    expect(result.current.data).toBe(null);
+    expect(result.current.error).toBe(null);
+  });
 
-    afterEach(() => {
-        jest.clearAllMocks();
-    });
+  it("should handle an invalid URL", async () => {
+    global.fetch = jest.fn(() => Promise.reject(new Error("Invalid URL")));
+    const { result, waitForNextUpdate } = renderHook(() =>
+      useFetch("invalid-url"),
+    );
+    await waitForNextUpdate();
+    expect(result.current.loading).toBe(false);
+    expect(result.current.data).toBe(null);
+    expect(result.current.error).toBeInstanceOf(Error);
+    expect(result.current.error.message).toBe("Invalid URL");
+  });
 
-    it('should return loading true initially', () => {
-        const { result } = renderHook(() => useFetch(jsonPlaceholder));
-        act(() => {
-            result.current.loading = false;
-        });
-        expect(result.current.loading).toBe(false);
-        expect(result.current.data).toBeNull();
-        expect(result.current.error).toBeNull();
-    });
+  it("should handle network errors", async () => {
+    global.fetch = jest.fn(() => Promise.reject(new Error("Network Error")));
+    const { result, waitForNextUpdate } = renderHook(() =>
+      useFetch("https://example.com"),
+    );
+    await waitForNextUpdate();
+    expect(result.current.loading).toBe(false);
+    expect(result.current.data).toBe(null);
+    expect(result.current.error).toBeInstanceOf(Error);
+    expect(result.current.error.message).toBe("Network Error");
+  });
 
-    it('should fetch data successfully', async () => {
-        const mockData = { message: 'Success' };
-        fetch.mockResolvedValueOnce({
-            ok: true,
-            json: jest.fn().mockResolvedValueOnce(mockData),
-        });
+  it("should handle non-JSON response", async () => {
+    global.fetch = jest.fn(() =>
+      Promise.resolve({
+        ok: true,
+        json: () => Promise.resolve("Not JSON"),
+      }),
+    );
+    const { result, waitForNextUpdate } = renderHook(() =>
+      useFetch("https://example.com"),
+    );
+    await waitForNextUpdate();
+    expect(result.current.loading).toBe(false);
+    expect(result.current.data).toBe("Not JSON");
+    expect(result.current.error).toBe(null);
+  });
 
-        const { result } = renderHook(() => useFetch(jsonPlaceholder));
-        await waitFor(async () => {
-            expect(result.current.loading).toBe(true);
-            expect(result.current.data).toEqual(mockData);
-            expect(result.current.error).toBeNull();
-        });
-    });
+  it("should fetch data with POST method", async () => {
+    const mockData = { id: 1, name: "Test" };
+    global.fetch = jest.fn(() =>
+      Promise.resolve({
+        ok: true,
+        json: () => Promise.resolve(mockData),
+      }),
+    );
+    const { result, waitForNextUpdate } = renderHook(() =>
+      useFetch("https://example.com", {
+        method: "POST",
+        body: { name: "Test" },
+      }),
+    );
+    await waitForNextUpdate();
+    expect(result.current.loading).toBe(false);
+    expect(result.current.data).toEqual(mockData);
+    expect(result.current.error).toBe(null);
+  });
 
-    it('should handle fetch error', async () => {
-        const mockError = new Error('Fetch failed');
-        fetch.mockRejectedValueOnce(mockError);
-
-        const { result } = renderHook(() => useFetch(jsonPlaceholder));
-        await waitFor(async () => {
-            await act(async () => {
-                // Wait for the fetch to complete
-            });
-            expect(result.current.loading).toBe(false);
-            expect(result.current.data).toBeNull();
-            expect(result.current.error).toEqual(mockError);
-        });
-    });
-
-    it('should handle non-200 responses', async () => {
-        fetch.mockResolvedValueOnce({
-            ok: false,
-            status: 404,
-            json: jest.fn().mockResolvedValueOnce({ message: 'Not Found' }),
-        });
-
-        const { result } = renderHook(() => useFetch(jsonPlaceholder));
-        await waitFor(async () => {
-            await act(async () => {
-                // Wait for the fetch to complete
-            });
-            expect(result.current.loading).toBe(false);
-            expect(result.current.data).toBeNull();
-            expect(result.current.error).toEqual(new Error("Network response was not ok"));
-        });
-    });
+  it("should send custom headers", async () => {
+    const mockData = { id: 1, name: "Test" };
+    global.fetch = jest.fn(() =>
+      Promise.resolve({
+        ok: true,
+        json: () => Promise.resolve(mockData),
+      }),
+    );
+    const { result, waitForNextUpdate } = renderHook(() =>
+      useFetch("https://example.com", {
+        headers: { Authorization: "Bearer token" },
+      }),
+    );
+    await waitForNextUpdate();
+    expect(result.current.loading).toBe(false);
+    expect(result.current.data).toEqual(mockData);
+    expect(result.current.error).toBe(null);
+    expect(global.fetch).toHaveBeenCalledWith(
+      "https://example.com",
+      expect.objectContaining({
+        headers: expect.objectContaining({
+          Authorization: "Bearer token",
+        }),
+      }),
+    );
+  });
 });
